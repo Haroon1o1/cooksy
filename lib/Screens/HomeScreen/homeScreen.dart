@@ -3,6 +3,7 @@ import 'package:cooksy/Screens/HomeScreen/Widgets/categoryItem.dart';
 import 'package:cooksy/Screens/HomeScreen/Widgets/chefCard.dart';
 import 'package:cooksy/Screens/HomeScreen/Widgets/searchField.dart';
 import 'package:cooksy/Screens/HomeScreen/Widgets/topBar.dart';
+import 'package:cooksy/Screens/NearbyScreen/Screen/Nearby.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -48,7 +49,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Order screen')));
         break;
       case 2:
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nearby screen')));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => NearbyScreen()));
+        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nearby screen')));
         break;
       case 3:
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile screen')));
@@ -108,7 +110,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.black87,
                       ),
                     ),
-                    Icon(Icons.arrow_forward, color: Color(0xFFA93929), size: 20),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => NearbyScreen()),
+                        );
+                      },
+                      child: Icon(Icons.arrow_forward, color: Color(0xFFA93929), size: 20),
+                    ),
                   ],
                 ),
                 SizedBox(height: 10),
@@ -116,12 +126,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
-
-                    CategoryItem(icon:"assets/icons/menu.png", title: "All",),
-                    CategoryItem(icon:"assets/icons/discount.png", title: "Discounts"),
-                    CategoryItem(icon:"assets/icons/veg.png", title: "Veg"),
-                    CategoryItem(icon:"assets/icons/nonveg.png", title: "Non Veg"),
+                    CategoryItem(icon: "assets/icons/menu.png", title: "All"),
+                    CategoryItem(icon: "assets/icons/discount.png", title: "Discounts"),
+                    CategoryItem(icon: "assets/icons/veg.png", title: "Veg"),
+                    CategoryItem(icon: "assets/icons/nonveg.png", title: "Non Veg"),
                   ],
                 ),
                 SizedBox(height: 10),
