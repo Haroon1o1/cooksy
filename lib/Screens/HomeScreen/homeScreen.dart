@@ -1,4 +1,5 @@
 import 'package:cooksy/Screens/HomeScreen/Widgets/bottomNavar.dart';
+import 'package:cooksy/Screens/HomeScreen/Widgets/categoryItem.dart';
 import 'package:cooksy/Screens/HomeScreen/Widgets/chefCard.dart';
 import 'package:cooksy/Screens/HomeScreen/Widgets/searchField.dart';
 import 'package:cooksy/Screens/HomeScreen/Widgets/topBar.dart';
@@ -80,7 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         child: CustomBottomNavBar(selectedIndex: _selectedIndex, onItemTapped: _onItemTapped),
-
       ),
       body: SafeArea(
         child: Padding(
@@ -116,10 +116,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildCategory("assets/icons/menu.png", "All"),
-                    _buildCategory("assets/icons/discount.png", "Discounts"),
-                    _buildCategory("assets/icons/veg.png", "Veg"),
-                    _buildCategory("assets/icons/nonveg.png", "Non Veg"),
+
+
+                    CategoryItem(icon:"assets/icons/menu.png", title: "All",),
+                    CategoryItem(icon:"assets/icons/discount.png", title: "Discounts"),
+                    CategoryItem(icon:"assets/icons/veg.png", title: "Veg"),
+                    CategoryItem(icon:"assets/icons/nonveg.png", title: "Non Veg"),
                   ],
                 ),
                 SizedBox(height: 10),
@@ -161,46 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategory(String icon, String title) {
-    final size = MediaQuery.of(context).size;
-    final isSelected = _selectedCategory == title;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedCategory = title;
-        });
-      },
-      child: Container(
-        width: size.width * 0.2,
-        height: size.width * 0.2,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isSelected ? Colors.transparent : Color(0xFFD7D7D7),
-            width: 1.5,
-          ),
-          color: isSelected ? Color(0xFFA93929) : Colors.white,
-          // shape: BoxShape.circle,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(icon, color: isSelected ? Colors.white : Color(0xFFA93929), width: 24),
-            SizedBox(height: 8),
-            Text(
-              title,
-              style: GoogleFonts.poppins(
-                fontSize: isSelected ? 13 : 12,
-                fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
-                color: isSelected ? Colors.white : Colors.black,
-              ),
-            ),
-          ],
         ),
       ),
     );
