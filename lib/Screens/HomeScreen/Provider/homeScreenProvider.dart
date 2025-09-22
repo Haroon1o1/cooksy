@@ -1,4 +1,4 @@
-import 'package:cooksy/Screens/HomeScreen/model/chefModel.dart';
+import 'package:cooksy/models/chefModel.dart';
 import 'package:flutter/material.dart';
 
 class ChefProvider with ChangeNotifier {

@@ -25,10 +25,10 @@ class CategoryItem extends StatelessWidget {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: isSelected ? Colors.redAccent : Colors.red.shade50,
-              shape: BoxShape.circle,
+              color: isSelected ? Color(0xFFA93929) : Colors.red.shade50,
+              // shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: isSelected ? Colors.white : Colors.redAccent, size: 24),
+            child: Icon(icon, color: isSelected ? Colors.white : Color(0xFFA93929), size: 24),
           ),
           const SizedBox(height: 8),
           Text(
@@ -36,7 +36,7 @@ class CategoryItem extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: isSelected ? Colors.redAccent : Colors.black87,
+              color: isSelected ? Color(0xFFA93929) : Colors.black87,
             ),
           ),
         ],
