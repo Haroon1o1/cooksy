@@ -137,27 +137,22 @@ class _NearbyScreenState extends State<NearbyScreen> {
       _markers = {...restaurantMarkers, if (_userLocationMarker != null) _userLocationMarker!};
     });
   }
-void _onCameraMove(CameraPosition position) {
-  if (_allMarkers.isEmpty) return;
 
-  if (position.zoom < minZoomForMarkers) {
-    // Only hide restaurant markers
-    setState(() {
-      _markers = {
-        if (_userLocationMarker != null) _userLocationMarker!,
-      };
-    });
-  } else {
-    // Show restaurant markers along with user marker
-    setState(() {
-      _markers = {
-        ..._allMarkers,
-        if (_userLocationMarker != null) _userLocationMarker!,
-      };
-    });
+  void _onCameraMove(CameraPosition position) {
+    if (_allMarkers.isEmpty) return;
+
+    if (position.zoom < minZoomForMarkers) {
+      // Only hide restaurant markers
+      setState(() {
+        _markers = {if (_userLocationMarker != null) _userLocationMarker!};
+      });
+    } else {
+      // Show restaurant markers along with user marker
+      setState(() {
+        _markers = {..._allMarkers, if (_userLocationMarker != null) _userLocationMarker!};
+      });
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
