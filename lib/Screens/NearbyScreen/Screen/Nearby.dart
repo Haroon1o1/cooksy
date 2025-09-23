@@ -167,18 +167,21 @@ void _onCameraMove(CameraPosition position) {
 
     return Scaffold(
       appBar: AppBar(backgroundColor: Color(0xFFA93929)),
-      body: GoogleMap(
-        initialCameraPosition: CameraPosition(
-          target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-          zoom: 16,
+      body: IgnorePointer(
+        ignoring: true,
+        child: GoogleMap(
+          initialCameraPosition: CameraPosition(
+            target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+            zoom: 16,
+          ),
+          myLocationEnabled: false,
+          myLocationButtonEnabled: true,
+          markers: _markers,
+          onCameraMove: _onCameraMove, // listen to camera changes
+          onMapCreated: (controller) {
+            _mapController = controller;
+          },
         ),
-        myLocationEnabled: false,
-        myLocationButtonEnabled: true,
-        markers: _markers,
-        onCameraMove: _onCameraMove, // listen to camera changes
-        onMapCreated: (controller) {
-          _mapController = controller;
-        },
       ),
     );
   }
