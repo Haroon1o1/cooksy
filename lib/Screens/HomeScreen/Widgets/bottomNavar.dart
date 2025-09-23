@@ -1,3 +1,4 @@
+import 'package:cooksy/Screens/NearbyScreen/Screen/Nearby.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
@@ -34,7 +35,12 @@ class CustomBottomNavBar extends StatelessWidget {
                 _buildNavItem("assets/icons/home.png", "Home", 0),
                 _buildNavItem("assets/icons/order.png", "Order", 1),
                 SizedBox(width: 50), // space for floating button
-                _buildNavItem("assets/icons/nearby.png", "Nearby", 2),
+                GestureDetector(
+                  onTap:(){Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => NearbyScreen()),
+                        );},
+                  child: _buildNavItem("assets/icons/nearby.png", "Nearby", 2)),
                 _buildNavItem("assets/icons/profile.png", "Profile", 3),
               ],
             ),

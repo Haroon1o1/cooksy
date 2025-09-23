@@ -1,11 +1,9 @@
-import 'package:cooksy/Screens/NearbyScreen/Screen/RadarLoadingScreen.dart';
-import 'package:cooksy/Screens/NearbyScreen/widgets/RestaurantMarker.dart';
-import 'package:cooksy/Screens/NearbyScreen/widgets/scanning_painter.dart';
+import 'package:cooksy/Screens/NearbyScreen/widgets/createMarker.dart';
+import 'package:cooksy/Screens/NearbyScreen/widgets/resturantInfo.dart';
 import 'package:cooksy/models/restaurants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'dart:math' as math;
 
 class NearbyScreen extends StatefulWidget {
   const NearbyScreen({super.key});
@@ -14,15 +12,14 @@ class NearbyScreen extends StatefulWidget {
   State<NearbyScreen> createState() => _NearbyScreenState();
 }
 
-class _NearbyScreenState extends State<NearbyScreen> with TickerProviderStateMixin {
+class _NearbyScreenState extends State<NearbyScreen> {
   GoogleMapController? _mapController;
   LocationData? _currentLocation;
-  late AnimationController _scanningController;
-  late AnimationController _pulseController;
-  late Animation<double> _scanningAnimation;
-  late Animation<double> _pulseAnimation;
+  Set<Marker> _markers = {};
+  Set<Marker> _allMarkers = {};
+  Marker? _userLocationMarker;
+  final double minZoomForMarkers = 14;
 
-  // Sample nearby restaurants data with real coordinates
   final List<Restaurant> _restaurants = [
     Restaurant(
       id: 'veg1',
@@ -30,23 +27,31 @@ class _NearbyScreenState extends State<NearbyScreen> with TickerProviderStateMix
       rating: 4.5,
       latitude: 33.494078,
       longitude: 73.0929396,
-      image: 'veg1',
+      image: 'assets/images/profile.jpg',
     ),
     Restaurant(
-      id: 'veg2',
-      name: 'Veggie Delight',
+      id: 'res1',
+      name: 'Spice Garden',
+      rating: 4.3,
+      latitude: 32.580583,
+      longitude: 74.480874,
+      image: 'assets/images/profile.jpg',
+    ),
+    Restaurant(
+      id: 'res2',
+      name: 'Grill & Chill',
       rating: 4.1,
-      latitude: 33.4947029,
-      longitude: 73.0921478,
-      image: 'veg2',
+      latitude: 32.581100,
+      longitude: 74.480500,
+      image: 'assets/images/profile.jpg',
     ),
     Restaurant(
-      id: 'veg3',
-      name: 'Plant Paradise',
-      rating: 4.8,
-      latitude: 33.4947117,
-      longitude: 73.0949464,
-      image: 'veg3',
+      id: 'res3',
+      name: 'Pizza Corner',
+      rating: 4.6,
+      latitude: 32.580000,
+      longitude: 74.481300,
+      image: 'assets/images/profile.jpg',
     ),
   ];
 
@@ -54,35 +59,27 @@ class _NearbyScreenState extends State<NearbyScreen> with TickerProviderStateMix
   void initState() {
     super.initState();
     _getUserLocation();
-
-    // Initialize animations
-    _scanningController = AnimationController(duration: const Duration(seconds: 3), vsync: this);
-
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _scanningAnimation = Tween<double>(
-      begin: 0,
-      end: 2 * math.pi,
-    ).animate(CurvedAnimation(parent: _scanningController, curve: Curves.linear));
-
-    _pulseAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.2,
-    ).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut));
-
-    // Start animations
-    _scanningController.repeat();
-    _pulseController.repeat(reverse: true);
   }
 
-  @override
-  void dispose() {
-    _scanningController.dispose();
-    _pulseController.dispose();
-    super.dispose();
+  Future<void> _updateUserLocationMarker() async {
+    if (_currentLocation == null) return;
+
+    final customIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(40, 40)),
+      'assets/icons/home-3d.png',
+    );
+
+    final marker = Marker(
+      markerId: const MarkerId('user_location'),
+      position: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+      icon: customIcon,
+    );
+
+    setState(() {
+      _userLocationMarker = marker;
+      // Keep restaurant markers too
+      _markers = {..._allMarkers, marker};
+    });
   }
 
   Future<void> _getUserLocation() async {
@@ -105,6 +102,9 @@ class _NearbyScreenState extends State<NearbyScreen> with TickerProviderStateMix
     setState(() {
       _currentLocation = loc;
     });
+    await _updateUserLocationMarker();
+
+    await _loadMarkers();
 
     if (_mapController != null) {
       _mapController!.animateCamera(
@@ -115,110 +115,71 @@ class _NearbyScreenState extends State<NearbyScreen> with TickerProviderStateMix
     }
   }
 
-  Offset _latLngToScreenPoint(double latitude, double longitude) {
-    if (_currentLocation == null) return const Offset(0, 0);
+  Future<void> _loadMarkers() async {
+    final restaurantMarkers = <Marker>{};
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    // Calculate the difference from center
-    final latDiff = latitude - _currentLocation!.latitude!;
-    final lngDiff = longitude - _currentLocation!.longitude!;
-
-    // Convert to screen coordinates (scale factor for zoom level 16)
-    const double scale = 100000.0; // Adjust this value to scale properly
-
-    final x = screenWidth / 2 + (lngDiff * scale);
-    final y = screenHeight / 2 - (latDiff * scale);
-
-    return Offset(x, y);
-  }
-
-  void _showRestaurantInfo(Restaurant restaurant) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              restaurant.name,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.star, color: Colors.orange),
-                Text('${restaurant.rating}'),
-              ],
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
-          ],
+    for (final restaurant in _restaurants) {
+      final icon = await createCustomMarkerIcon(restaurant.image, restaurant.rating, context);
+      restaurantMarkers.add(
+        Marker(
+          onTap: () => resturantInfo(context, restaurant),
+          markerId: MarkerId(restaurant.id),
+          position: LatLng(restaurant.latitude, restaurant.longitude),
+          icon: icon,
+          infoWindow: InfoWindow(title: restaurant.name, snippet: "Rating: ${restaurant.rating}"),
         ),
-      ),
-    );
+      );
+    }
+
+    setState(() {
+      // Merge restaurant markers with user location marker
+      _allMarkers = restaurantMarkers;
+      _markers = {...restaurantMarkers, if (_userLocationMarker != null) _userLocationMarker!};
+    });
   }
+void _onCameraMove(CameraPosition position) {
+  if (_allMarkers.isEmpty) return;
+
+  if (position.zoom < minZoomForMarkers) {
+    // Only hide restaurant markers
+    setState(() {
+      _markers = {
+        if (_userLocationMarker != null) _userLocationMarker!,
+      };
+    });
+  } else {
+    // Show restaurant markers along with user marker
+    setState(() {
+      _markers = {
+        ..._allMarkers,
+        if (_userLocationMarker != null) _userLocationMarker!,
+      };
+    });
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Nearby"),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-      ),
-      body: _currentLocation == null
-          ? Center(child: const CircularProgressIndicator(color: Color(0xFFA93929)))
-          // RadarLoadingScreen()
-          : Stack(
-              children: [
-                GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-                    zoom: 16,
-                  ),
-                  myLocationEnabled: false,
-                  myLocationButtonEnabled: false,
-                  markers: {},
-                  onMapCreated: (controller) {
-                    _mapController = controller;
-                  },
-                ),
-                // Scanning Animation Overlay
-                Positioned.fill(
-                  child: AnimatedBuilder(
-                    animation: Listenable.merge([_scanningAnimation, _pulseAnimation]),
-                    builder: (context, child) {
-                      return CustomPaint(
-                        painter: ScanningPainter(
-                          scanningAngle: _scanningAnimation.value,
-                          pulseScale: _pulseAnimation.value,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                // Restaurant Markers Overlay
-                if (_currentLocation != null)
-                  ..._restaurants.map((restaurant) {
-                    final screenPoint = _latLngToScreenPoint(
-                      restaurant.latitude,
-                      restaurant.longitude,
-                    );
+    if (_currentLocation == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
-                    return RestaurantMarker(
-                      restaurant: restaurant,
-                      position: screenPoint,
-                      onTap: () => _showRestaurantInfo(restaurant),
-                    );
-                  }),
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(backgroundColor: Color(0xFFA93929)),
+      body: GoogleMap(
+        initialCameraPosition: CameraPosition(
+          target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+          zoom: 16,
+        ),
+        myLocationEnabled: false,
+        myLocationButtonEnabled: true,
+        markers: _markers,
+        onCameraMove: _onCameraMove, // listen to camera changes
+        onMapCreated: (controller) {
+          _mapController = controller;
+        },
+      ),
     );
   }
 }

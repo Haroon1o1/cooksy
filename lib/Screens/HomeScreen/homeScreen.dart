@@ -110,15 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.black87,
                       ),
                     ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => NearbyScreen()),
-                        );
-                      },
-                      child: Icon(Icons.arrow_forward, color: Color(0xFFA93929), size: 20),
-                    ),
+                    Icon(Icons.arrow_forward, color: Color(0xFFA93929), size: 20),
                   ],
                 ),
                 SizedBox(height: 10),

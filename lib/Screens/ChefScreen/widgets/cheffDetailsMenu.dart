@@ -5,15 +5,21 @@ class CheffDetailsMenu extends StatelessWidget {
   final String name;
   final String imgUrl;
   final String price;
+  final bool isFavorite;
 
-  CheffDetailsMenu({super.key, required this.name, required this.imgUrl, required this.price});
+  const CheffDetailsMenu({
+    super.key,
+    required this.name,
+    required this.imgUrl,
+    required this.price,
+    this.isFavorite = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        margin: EdgeInsets.only(bottom: 10),
-        // alignment: Alignment.center,
+        margin: const EdgeInsets.only(bottom: 12),
         width: MediaQuery.of(context).size.width * 0.89,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -22,7 +28,7 @@ class CheffDetailsMenu extends StatelessWidget {
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 10,
-              offset: Offset(2, 4),
+              offset: const Offset(2, 4),
             ),
           ],
         ),
@@ -30,9 +36,11 @@ class CheffDetailsMenu extends StatelessWidget {
         child: Stack(
           children: [
             Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Image
                 ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   child: Image.asset(
                     imgUrl,
                     height: 160,
@@ -40,48 +48,48 @@ class CheffDetailsMenu extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            name,
-                            style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFFA93929),
-                            ),
-                          ),
 
-                          Icon(Icons.favorite, color: Colors.red),
-                        ],
+                // Name + Favorite
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFFA93929),
+                          ),
+                        ),
                       ),
+                      Icon(Icons.favorite, color: isFavorite ? Colors.red : Colors.grey),
                     ],
                   ),
                 ),
               ],
             ),
+
+            // Price Tag
             Positioned(
               top: 12,
               right: 12,
-              child: GestureDetector(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Color(0xFFA93929),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    price,
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFA93929),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  price,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
                   ),
                 ),
               ),

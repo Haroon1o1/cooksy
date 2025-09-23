@@ -1,4 +1,3 @@
-import 'package:cooksy/Screens/NearbyScreen/widgets/RadarLoadingPainter.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -131,28 +130,28 @@ class _RadarLoadingScreenState extends State<RadarLoadingScreen> with TickerProv
 
               const SizedBox(height: 60),
 
-              // Radar Animation
-              AnimatedBuilder(
-                animation: _pulseAnimation,
-                child: SizedBox(
-                  width: 250,
-                  height: 250,
-                  child: AnimatedBuilder(
-                    animation: _radarAnimation,
-                    builder: (context, child) {
-                      return CustomPaint(
-                        painter: RadarLoadingPainter(
-                          radarAngle: _radarAnimation.value,
-                          pulseScale: _pulseAnimation.value,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                builder: (context, child) {
-                  return Transform.scale(scale: _pulseAnimation.value, child: child);
-                },
-              ),
+              // // Radar Animation
+              // AnimatedBuilder(
+              //   animation: _pulseAnimation,
+              //   child: SizedBox(
+              //     width: 250,
+              //     height: 250,
+              //     child: AnimatedBuilder(
+              //       animation: _radarAnimation,
+              //       builder: (context, child) {
+              //         return CustomPaint(
+              //           painter: RadarLoadingPainter(
+              //             radarAngle: _radarAnimation.value,
+              //             pulseScale: _pulseAnimation.value,
+              //           ),
+              //         );
+              //       },
+              //     ),
+              //   ),
+              //   builder: (context, child) {
+              //     return Transform.scale(scale: _pulseAnimation.value, child: child);
+              //   },
+              // ),
 
               const SizedBox(height: 40),
 

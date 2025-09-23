@@ -6,7 +6,7 @@ class RestaurantMarker extends StatelessWidget {
   final VoidCallback onTap;
   final Offset position;
 
-  const RestaurantMarker({
+  RestaurantMarker({
     super.key,
     required this.restaurant,
     required this.onTap,
@@ -21,49 +21,50 @@ class RestaurantMarker extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          width: 50,
-          height: 50,
+          width: 60,
+          height: 60,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(25),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 6,
-                offset: const Offset(0, 2),
+                offset: Offset(0, 2),
               ),
             ],
           ),
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
               Center(
                 child: Container(
-                  width: 40,
-                  height: 40,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: Colors.grey[300],
+                    image: DecorationImage(image: AssetImage(restaurant.image)),
                   ),
-                  child: const Icon(Icons.restaurant, color: Colors.green),
                 ),
               ),
               Positioned(
                 bottom: 0,
-                right: 0,
+                left: 10,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  padding: EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(8),
+                    color: Color(0xFFA93929),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star, color: Colors.white, size: 10),
-                      const SizedBox(width: 2),
+                      Icon(Icons.star, color: Colors.white, size: 10),
+                      SizedBox(width: 2),
                       Text(
                         '${restaurant.rating}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
