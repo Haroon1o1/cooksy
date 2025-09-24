@@ -118,7 +118,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
           ),
         ],
       ),
-      bottomNavigationBar:Bottombutton() ,
+      bottomNavigationBar: BottomButton(),
     );
   }
 }

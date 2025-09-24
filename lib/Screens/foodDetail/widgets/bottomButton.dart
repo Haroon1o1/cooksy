@@ -1,14 +1,16 @@
+import 'package:cooksy/Screens/foodDetail/widgets/DateSelectionSheet.dart';
 import 'package:cooksy/widgets/CustomButton.dart';
 import 'package:flutter/material.dart';
 
-class Bottombutton extends StatelessWidget {
-  const Bottombutton({super.key});
+class BottomButton extends StatelessWidget {
+  const BottomButton({super.key});
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final isSmallScreen = screenHeight < 600;
+
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.05),
       decoration: BoxDecoration(
@@ -17,7 +19,7 @@ class Bottombutton extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
-            offset: Offset(0, -2),
+            offset: const Offset(0, -2),
           ),
         ],
       ),
@@ -27,11 +29,20 @@ class Bottombutton extends StatelessWidget {
           height: isSmallScreen ? 45 : 50,
           textColor: Colors.white,
           text: "Add to Basket",
-          press: () {},
-          color: Color(0xFFA93929),
+          press: () => _onAddToBasketPressed(context),
+          color: const Color(0xFFA93929),
           size: 15,
         ),
       ),
+    );
+  }
+
+  void _onAddToBasketPressed(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const DateSelectionSheet(),
     );
   }
 }

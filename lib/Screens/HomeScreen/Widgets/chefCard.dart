@@ -1,4 +1,5 @@
 import 'package:cooksy/Screens/ChefScreen/CheffScreen.dart';
+import 'package:cooksy/Screens/foodDetail/Screen/FoodDetailScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -27,7 +28,7 @@ class ChefCard extends StatelessWidget {
     return Center(
       child: GestureDetector(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => CheffScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => FoodDetailScreen()));
         },
         child: Container(
           // alignment: Alignment.center,
