@@ -51,7 +51,7 @@ class CheffDetailsMenu extends StatelessWidget {
 
                 // Name + Favorite
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

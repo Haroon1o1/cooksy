@@ -1,3 +1,4 @@
+import 'package:cooksy/Screens/directionScreen/directionScreen.dart';
 import 'package:cooksy/widgets/CustomButton.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -110,17 +111,39 @@ class CheffDetailsHeader extends StatelessWidget {
                 ),
 
                 // Follow button
-                SizedBox(
-                  width: 100,
-                  child: CustomButton(
-                    height: 40,
-                    textColor: Colors.white,
-                    text: "Follow",
-                    press: () {},
-                    size: 14,
-                    hasIcon: false,
-                    color: Colors.black,
-                  ),
+                Column(
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      child: CustomButton(
+                        height: 30,
+                        textColor: Colors.white,
+                        text: "Follow",
+                        press: () {},
+                        size: 13,
+                        hasIcon: false,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    SizedBox(
+                      width: 100,
+                      child: CustomButton(
+                        height: 30,
+                        textColor: Colors.white,
+                        text: "Direction",
+                        press: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => DirectionScreen()),
+                          );
+                        },
+                        size: 13,
+                        hasIcon: false,
+                        color: Color(0xFFA93929),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

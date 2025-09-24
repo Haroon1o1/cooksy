@@ -2,8 +2,10 @@ import 'package:cooksy/Screens/NearbyScreen/widgets/createMarker.dart';
 import 'package:cooksy/Screens/NearbyScreen/widgets/resturantInfo.dart';
 import 'package:cooksy/models/restaurants.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:lottie/lottie.dart' hide Marker;
 
 class NearbyScreen extends StatefulWidget {
   const NearbyScreen({super.key});
@@ -120,63 +122,108 @@ class _NearbyScreenState extends State<NearbyScreen> {
 
     for (final restaurant in _restaurants) {
       final icon = await createCustomMarkerIcon(restaurant.image, restaurant.rating, context);
+
       restaurantMarkers.add(
         Marker(
-          onTap: () => resturantInfo(context, restaurant),
           markerId: MarkerId(restaurant.id),
           position: LatLng(restaurant.latitude, restaurant.longitude),
           icon: icon,
-          infoWindow: InfoWindow(title: restaurant.name, snippet: "Rating: ${restaurant.rating}"),
+          infoWindow: InfoWindow.noText, // avoids default centering
+          consumeTapEvents: true, // important: prevents automatic camera movement
+          onTap: () {
+            // Your custom popup function
+            resturantInfo(context, restaurant);
+          },
         ),
       );
     }
 
     setState(() {
-      // Merge restaurant markers with user location marker
       _allMarkers = restaurantMarkers;
       _markers = {...restaurantMarkers, if (_userLocationMarker != null) _userLocationMarker!};
     });
   }
 
-  void _onCameraMove(CameraPosition position) {
-    if (_allMarkers.isEmpty) return;
+  // void _onCameraMove(CameraPosition position) {
+  //   if (_allMarkers.isEmpty) return;
 
-    if (position.zoom < minZoomForMarkers) {
-      // Only hide restaurant markers
-      setState(() {
-        _markers = {if (_userLocationMarker != null) _userLocationMarker!};
-      });
-    } else {
-      // Show restaurant markers along with user marker
-      setState(() {
-        _markers = {..._allMarkers, if (_userLocationMarker != null) _userLocationMarker!};
-      });
-    }
-  }
+  //   if (position.zoom < minZoomForMarkers) {
+  //     // Only hide restaurant markers
+  //     setState(() {
+  //       _markers = {if (_userLocationMarker != null) _userLocationMarker!};
+  //     });
+  //   } else {
+  //     // Show restaurant markers along with user marker
+  //     setState(() {
+  //       _markers = {..._allMarkers, if (_userLocationMarker != null) _userLocationMarker!};
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     if (_currentLocation == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: CircularProgressIndicator(color: Color(0xFFA93929))),
+      );
     }
 
     return Scaffold(
-      appBar: AppBar(backgroundColor: Color(0xFFA93929)),
-      body: IgnorePointer(
-        ignoring: true,
-        child: GoogleMap(
-          initialCameraPosition: CameraPosition(
-            target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-            zoom: 16,
-          ),
-          myLocationEnabled: false,
-          myLocationButtonEnabled: true,
-          markers: _markers,
-          onCameraMove: _onCameraMove, // listen to camera changes
-          onMapCreated: (controller) {
-            _mapController = controller;
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
           },
+          icon: Icon(Icons.arrow_back, color: Colors.white),
         ),
+        centerTitle: true,
+        title: Text(
+          "Nearby Cheffs",
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Color(0xFFA93929),
+      ),
+      body: Stack(
+        children: [
+          // Google Map should be interactive
+          GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+              zoom: 16,
+            ),
+            myLocationEnabled: false,
+            myLocationButtonEnabled: true,
+            markers: _markers,
+            zoomGesturesEnabled: false, // disable zoom
+            scrollGesturesEnabled: false, // disable scroll/pan
+            rotateGesturesEnabled: false, // disable rotation
+            tiltGesturesEnabled: false,
+            // onCameraMove: _onCameraMove, // listen to camera changes
+            onMapCreated: (controller) {
+              _mapController = controller;
+            },
+          ),
+
+          // Centered Lottie animation (non-blocking)
+          Center(
+            child: IgnorePointer(
+              ignoring: true,
+              child: Lottie.asset(
+                'assets/animation.json',
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.9,
+                fit: BoxFit.contain,
+                repeat: true,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
