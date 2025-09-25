@@ -6,9 +6,14 @@ import 'package:google_fonts/google_fonts.dart';
 class Bottomcontainer extends StatelessWidget {
   final Restaurant resturants;
   final bool isShowing;
-  final  VoidCallback onTap;
+  final VoidCallback onTap;
 
-  Bottomcontainer({super.key, required this.resturants, required this.isShowing,required this.onTap});
+  Bottomcontainer({
+    super.key,
+    required this.resturants,
+    required this.isShowing,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +21,10 @@ class Bottomcontainer extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
         boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))],
       ),
       child: isShowing

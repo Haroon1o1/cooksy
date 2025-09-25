@@ -129,10 +129,13 @@ class OrderConfirmationSheet extends StatelessWidget {
   }
 
   Widget _buildKitchenAvatar() {
-    return CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.grey[300],
-      child: Icon(Icons.store, color: Colors.grey[600], size: 20),
+    return Container(
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        image: DecorationImage(image: AssetImage("assets/images/profile.jpg")),
+      ),
     );
   }
 

@@ -1,4 +1,4 @@
-import 'package:cooksy/Screens/HomeScreen/Widgets/bottomNavar.dart';
+import 'package:cooksy/Screens/mainScreen/widget/bottomNavar.dart';
 import 'package:cooksy/Screens/HomeScreen/Widgets/categoryItem.dart';
 import 'package:cooksy/Screens/HomeScreen/Widgets/chefCard.dart';
 import 'package:cooksy/Screens/HomeScreen/Widgets/searchField.dart';
@@ -75,15 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: Offset(0, -5)),
-          ],
-        ),
-        child: CustomBottomNavBar(selectedIndex: _selectedIndex, onItemTapped: _onItemTapped),
-      ),
+
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),

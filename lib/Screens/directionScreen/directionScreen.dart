@@ -1,8 +1,12 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:cooksy/models/restaurants.dart';
 import 'package:cooksy/widgets/CustomButton.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:cooksy/Screens/NearbyScreen/widgets/createMarker.dart';
 import 'package:cooksy/Screens/directionScreen/widget/bottomContainer.dart';
@@ -52,19 +56,33 @@ class _DirectionScreenState extends State<DirectionScreen> with SingleTickerProv
   Future<void> _getUserLocation() async {
     Location location = Location();
 
+    // Ensure service enabled
     bool serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
       serviceEnabled = await location.requestService();
-      if (!serviceEnabled) return;
+      if (!serviceEnabled) {
+        debugPrint("❌ Location service not enabled");
+        return;
+      }
     }
 
+    // Ensure permission granted
     PermissionStatus permissionGranted = await location.hasPermission();
     if (permissionGranted == PermissionStatus.denied) {
       permissionGranted = await location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) return;
+      if (permissionGranted != PermissionStatus.granted) {
+        debugPrint("❌ Location permission not granted");
+        return;
+      }
     }
 
+    // Get location
     final loc = await location.getLocation();
+    if (loc.latitude == null || loc.longitude == null) {
+      debugPrint("❌ Failed to fetch location");
+      return;
+    }
+
     setState(() {
       _currentLocation = loc;
     });
@@ -72,13 +90,11 @@ class _DirectionScreenState extends State<DirectionScreen> with SingleTickerProv
     await _updateUserLocationMarker();
     await _loadMarkers();
 
-    if (_mapController != null) {
-      _mapController!.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: LatLng(loc.latitude!, loc.longitude!), zoom: 16),
-        ),
-      );
-    }
+    _mapController?.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: LatLng(loc.latitude!, loc.longitude!), zoom: 16),
+      ),
+    );
   }
 
   Future<void> _updateUserLocationMarker() async {
@@ -115,7 +131,6 @@ class _DirectionScreenState extends State<DirectionScreen> with SingleTickerProv
           consumeTapEvents: true,
           onTap: () {
             // Show bottom container
-
           },
         ),
       );
@@ -127,40 +142,84 @@ class _DirectionScreenState extends State<DirectionScreen> with SingleTickerProv
     });
   }
 
-  void _drawRouteToRestaurant(LatLng restaurantLatLng) async {
+  Future<List<LatLng>> getRoutePoints(LatLng start, LatLng end) async {
+    final apiKey = 'AIzaSyDnAF3JAM7UqTudig7J-VRqTsdiyQ4Hw-Q'; // replace with your key
+    final url =
+        'https://maps.googleapis.com/maps/api/directions/json?origin=${start.latitude},${start.longitude}&destination=${end.latitude},${end.longitude}&key=$apiKey';
+
+    final response = await http.get(Uri.parse(url));
+    final data = json.decode(response.body);
+    log(response.body.toString());
+    if (data['status'] != 'OK') return [];
+
+    final points = data['routes'][0]['overview_polyline']['points'];
+    return _decodePolyline(points);
+  }
+
+  List<LatLng> _decodePolyline(String encoded) {
+    List<LatLng> poly = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      poly.add(LatLng(lat / 1E5, lng / 1E5));
+    }
+    return poly;
+  }
+
+  Future<void> _drawAnimatedRoute(LatLng destination) async {
     if (_currentLocation == null) return;
 
     final userLatLng = LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
 
-    final int steps = 50;
-    final List<LatLng> animatedPoints = [];
+    // Get route points from Directions API
+    final routePoints = await getRoutePoints(userLatLng, destination);
 
-    _polylines.clear();
+    // Animate the line
+    _animatePolyline(routePoints);
+  }
 
-    for (int i = 0; i <= steps; i++) {
-      final lat =
-          userLatLng.latitude + (restaurantLatLng.latitude - userLatLng.latitude) * i / steps;
-      final lng =
-          userLatLng.longitude + (restaurantLatLng.longitude - userLatLng.longitude) * i / steps;
+  Future<void> _animatePolyline(List<LatLng> routePoints) async {
+    if (routePoints.isEmpty) return;
 
-      animatedPoints.add(LatLng(lat, lng));
+    Set<Polyline> polylines = {};
+    List<LatLng> drawnPoints = [];
+
+    for (int i = 0; i < routePoints.length; i++) {
+      drawnPoints.add(routePoints[i]);
 
       setState(() {
-        _polylines = {
+        polylines = {
           Polyline(
             polylineId: const PolylineId('route'),
-            color: Color(0xFFA93929),
+            color: Colors.red,
             width: 5,
-            points: List.from(animatedPoints),
+            points: List.from(drawnPoints), // progressively add points
           ),
-
-
         };
-        setState(() {
-              _isBottomSheetVisible = true;
-            });
+        _polylines = polylines;
       });
 
+      // Small delay to create animation effect
       await Future.delayed(const Duration(milliseconds: 30));
     }
   }
@@ -174,58 +233,62 @@ class _DirectionScreenState extends State<DirectionScreen> with SingleTickerProv
       );
     }
 
-    return Scaffold(
-      backgroundColor: Color(0xFFc8f2dd),
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        centerTitle: true,
-        title: Text(
-          "Directions to Cheff",
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: Color(0xFFc8f2dd),
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(Icons.arrow_back, color: Colors.white),
           ),
+          centerTitle: true,
+          title: Text(
+            "Directions to Cheff",
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Color(0xFFA93929),
         ),
-        backgroundColor: Color(0xFFA93929),
-      ),
-      body: Column(
-        children: [
-          // Map area
-          Expanded(
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-                zoom: 16,
+        body: Column(
+          children: [
+            // Map area
+            Expanded(
+              child: GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+                  zoom: 16,
+                ),
+                markers: _markers,
+                polylines: _polylines,
+                myLocationEnabled: false,
+                myLocationButtonEnabled: true,
+                zoomGesturesEnabled: true,
+                scrollGesturesEnabled: true,
+                rotateGesturesEnabled: true,
+                tiltGesturesEnabled: true,
+                onMapCreated: (controller) => _mapController = controller,
               ),
-              markers: _markers,
-              polylines: _polylines,
-              myLocationEnabled: false,
-              myLocationButtonEnabled: true,
-              zoomGesturesEnabled: true,
-              scrollGesturesEnabled: true,
-              rotateGesturesEnabled: true,
-              tiltGesturesEnabled: true,
-              onMapCreated: (controller) => _mapController = controller,
             ),
-          ),
 
-          // Bottom container with automatic height animation
-          AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: Bottomcontainer(
-              resturants: _restaurants[0],
-              isShowing: _isBottomSheetVisible,
-              onTap: () {
-                _drawRouteToRestaurant(LatLng(_restaurants[1].latitude, _restaurants[1].longitude));
-              },
+            // Bottom container with automatic height animation
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: Bottomcontainer(
+                resturants: _restaurants[0],
+                isShowing: _isBottomSheetVisible,
+                onTap: () {
+                  log("djshjsdhsj");
+                  _drawAnimatedRoute(LatLng(_restaurants[1].latitude, _restaurants[1].longitude));
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

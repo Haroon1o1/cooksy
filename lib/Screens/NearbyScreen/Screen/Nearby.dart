@@ -172,12 +172,6 @@ class _NearbyScreenState extends State<NearbyScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-        ),
         centerTitle: true,
         title: Text(
           "Nearby Cheffs",
