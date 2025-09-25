@@ -1,3 +1,4 @@
+import 'package:cooksy/Screens/ChatScreen/Screens/ChatDetailScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -42,7 +43,7 @@ class OrderConfirmationSheet extends StatelessWidget {
           const SizedBox(height: 20),
           _buildCustomerServiceText(),
           const SizedBox(height: 20),
-          _buildKitchenInfo(),
+          _buildKitchenInfo(context),
           const SizedBox(height: 16),
           _buildPreparationTime(),
           const SizedBox(height: 20),
@@ -113,7 +114,7 @@ class OrderConfirmationSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildKitchenInfo() {
+  Widget _buildKitchenInfo(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(12)),
@@ -122,7 +123,7 @@ class OrderConfirmationSheet extends StatelessWidget {
           _buildKitchenAvatar(),
           const SizedBox(width: 12),
           _buildKitchenDetails(),
-          _buildActionButtons(),
+          _buildActionButtons(context),
         ],
       ),
     );
@@ -158,14 +159,16 @@ class OrderConfirmationSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(BuildContext context) {
     return Row(
       children: [
         _buildIconButton(
           icon: Icons.message,
           backgroundColor: Colors.white,
           iconColor: Colors.black,
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDetailScreen()));
+          },
         ),
         _buildIconButton(
           icon: Icons.call,

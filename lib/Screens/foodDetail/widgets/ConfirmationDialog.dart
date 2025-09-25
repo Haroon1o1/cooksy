@@ -1,5 +1,4 @@
 import 'package:cooksy/Screens/foodDetail/widgets/OrderConfirmationSheet.dart';
-import 'package:cooksy/Screens/foodDetail/widgets/bottomButton.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
