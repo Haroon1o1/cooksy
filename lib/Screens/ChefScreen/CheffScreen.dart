@@ -1,3 +1,4 @@
+import 'package:cooksy/Screens/ChatScreen/Screens/ChatDetailScreen.dart';
 import 'package:cooksy/Screens/ChefScreen/widgets/ChefHeader.dart';
 import 'package:cooksy/Screens/ChefScreen/widgets/CheffDetailsPosts.dart';
 import 'package:cooksy/Screens/ChefScreen/widgets/CheffReviews.dart';
@@ -38,6 +39,13 @@ class _CheffScreenState extends State<CheffScreen> with SingleTickerProviderStat
       top: false,
 
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Color(0xFFA93929),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDetailScreen()));
+          },
+          child: Icon(Icons.chat, color:Colors.white),
+        ),
         backgroundColor: Colors.white,
         extendBodyBehindAppBar: true,
         appBar: AppBar(

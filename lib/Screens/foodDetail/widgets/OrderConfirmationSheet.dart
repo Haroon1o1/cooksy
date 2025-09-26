@@ -1,4 +1,5 @@
 import 'package:cooksy/Screens/ChatScreen/Screens/ChatDetailScreen.dart';
+import 'package:cooksy/Screens/ChefScreen/CheffScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -120,7 +121,12 @@ class OrderConfirmationSheet extends StatelessWidget {
       decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(12)),
       child: Row(
         children: [
-          _buildKitchenAvatar(),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => CheffScreen()));
+            },
+            child: _buildKitchenAvatar(),
+          ),
           const SizedBox(width: 12),
           _buildKitchenDetails(),
           _buildActionButtons(context),

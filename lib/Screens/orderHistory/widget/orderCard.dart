@@ -1,3 +1,4 @@
+import 'package:cooksy/Screens/ChefScreen/CheffScreen.dart';
 import 'package:cooksy/Screens/TrackingUIScreen/trackingUiScreen.dart';
 import 'package:cooksy/widgets/CustomButton.dart';
 import 'package:flutter/material.dart';
@@ -50,9 +51,17 @@ class BuildOrderCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      radius: 25,
-                      backgroundImage: AssetImage("assets/images/profile.jpg"),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => CheffScreen()),
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 25,
+                        backgroundImage: AssetImage("assets/images/profile.jpg"),
+                      ),
                     ),
                     SizedBox(width: 10),
                     Column(
