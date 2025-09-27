@@ -45,19 +45,9 @@ Cooksy bridges the gap between **home chefs** and **customers**:
   - Favorites & follows for quick access  
   - Clean & modern Flutter UI  
 
----
 
-## 📱 Screenshots
 
-<div align="center">
-  <img src="assets/readme/screen1.png" alt="Cooksy Home" width="200"/>
-  <img src="assets/readme/screen2.png" alt="Orders" width="200"/>
-  <img src="assets/readme/screen3.png" alt="Nearby Chefs" width="200"/>
-  <img src="assets/readme/screen4.png" alt="Tracking" width="200"/>
-  <img src="assets/readme/screen5.png" alt="Chef Profile" width="200"/>
-</div>
 
----
 
 ## 🏗️ Tech Stack
 
